@@ -1,4 +1,5 @@
 from Server import Server
+from ClientConnection import ClientConnection
 
 class ClientServer(Server):
     
