@@ -1,9 +1,9 @@
 from multiprocessing import Process
 from abc import abstractmethod
-import queue
 import socket
 
 BUFFER_SIZE = 4096
+ID_PREFIX = b'ID: '
 
 class Connection(Process):
     
@@ -32,14 +32,48 @@ class Connection(Process):
             try:
                 data = self.handleOut()
                 self.socket.send(data)
-            except queue.Empty:
+            except QueueEmpty:
                 pass
         
         print("[-][" + self.__class__.__name__ + "] Thread closed " + self.ip + ":" + str(self.port))
         self.socket.close()
     
+    def trimQueue(self, queue):
+        if len(queue) > BUFFER_SIZE:
+            queue = queue[(BUFFER_SIZE / 2):]
+        return queue
+            
+    def cleanQueue(self, queue):
+        return b''
+    
+    def addMsgQueue(self, queue, msg):
+        return queue + msg
+    
+    def popQueue(self, queue):
+        return queue, self.cleanQueue(queue)
+    
+    def findId(self, msg):
+        if msg.startswith(ID_PREFIX):
+            identifier = msg[4:]
+            return identifier.replace(b'\n', b'').replace(b'\r', b'')
+    
+    def cleanAndInitializeQueues(self, id):
+        if id in self.din:
+            del self.din[id]
+        
+        self.din[id] = b''
+        
+        if id in self.dout:
+            del self.dout[id]
+        
+        self.dout[id] = b''
+    
     @abstractmethod
     def handleIn(self, msg): pass
     
     @abstractmethod
-    def handleOut(self): pass    
+    def handleOut(self): pass
+    
+# Exception raised when trying to read empty queue
+class QueueEmpty(Exception):
+    pass
