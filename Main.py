@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from multiprocessing import Manager
+from multiprocessing import Manager, Lock
 from IotServer import IotServer
 from ClientServer import ClientServer
 
@@ -15,15 +15,16 @@ if len(sys.argv) < 3:
 
 iot_port = int(sys.argv[1])
 client_port = int(sys.argv[2])
+lock = Lock()
 
 with Manager() as manager:
     din = manager.dict()
     dout = manager.dict()
 
-    iotServer = IotServer(tcp_ip, iot_port, din, dout)
+    iotServer = IotServer(tcp_ip, iot_port, din, dout, lock)
     iotServer.start()
 
-    clientServer = ClientServer(tcp_ip, client_port, din, dout)
+    clientServer = ClientServer(tcp_ip, client_port, din, dout, lock)
     clientServer.start()
 
     iotServer.join()

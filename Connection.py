@@ -7,7 +7,7 @@ ID_PREFIX = b'ID: '
 
 class Connection(Process):
     
-    def __init__(self, ip, port, socket, din, dout):
+    def __init__(self, ip, port, socket, din, dout, lock):
         Process.__init__(self)
         self.ip = ip
         self.port = port
@@ -15,6 +15,7 @@ class Connection(Process):
         self.din = din
         self.dout = dout
         self.id = ''
+        self.lock = lock
         print("[+][" + self.__class__.__name__ + "] New thread started for " + ip + ":" + str(port))
         
     def run(self):
@@ -23,14 +24,27 @@ class Connection(Process):
             try:
                 msg = self.socket.recv(4096)
                 if not msg: break
-                self.handleIn(msg)
+                self.lock.acquire()
+                try:
+                    self.handleIn(msg)
+                finally:
+                    self.lock.release()
                 print("[" + self.__class__.__name__ + "]received: ", str(msg))
                 continue
             except socket.timeout:
                 pass
+            except socket.error as e:
+                if e.errno == socket.errno.ECONNRESET:
+                    print("[" + self.__class__.__name__ + "] Connection reset.")
+                    break
+                raise
             
             try:
-                data = self.handleOut()
+                self.lock.acquire()
+                try:
+                    data = self.handleOut()
+                finally:
+                    self.lock.release()
                 self.socket.send(data)
             except QueueEmpty:
                 pass

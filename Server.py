@@ -4,12 +4,13 @@ import socket
 
 class Server(Process):
     
-    def __init__(self, ip, port, din, dout):
+    def __init__(self, ip, port, din, dout, lock):
         super().__init__()
         self.ip = ip
         self.port = port
         self.din = din
         self.dout = dout
+        self.lock = lock
         
     def run(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

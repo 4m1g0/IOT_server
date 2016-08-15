@@ -4,5 +4,5 @@ from ClientConnection import ClientConnection
 class ClientServer(Server):
     
     def createConnection(self, ip, port, sock):
-        service = ClientConnection(ip, port, sock, self.din, self.dout)
+        service = ClientConnection(ip, port, sock, self.din, self.dout, self.lock)
         service.start()

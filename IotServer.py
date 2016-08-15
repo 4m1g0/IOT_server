@@ -5,5 +5,5 @@ import time
 class IotServer(Server):
     
     def createConnection(self, ip, port, sock):
-        service = IotConnection(ip, port, sock, self.din, self.dout)
+        service = IotConnection(ip, port, sock, self.din, self.dout, self.lock)
         service.start()
