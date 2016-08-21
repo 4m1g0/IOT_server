@@ -6,6 +6,7 @@ import json
 
 hostName = ""
 hostPort = 9000
+cache = {}
 
 def getJson(url):
     r = requests.get(url)
@@ -25,7 +26,14 @@ def getJson(url):
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
-        lista = getJson("https://api.esios.ree.es/archives/80/download?date=" + self.path[1:])
+        lista = []
+        if self.path[1:] in cache:
+            lista = cache[self.path[1:]]
+            print("From cache:")
+        else:
+            lista = getJson("https://api.esios.ree.es/archives/80/download?date=" + self.path[1:])
+            cache[self.path[1:]] = lista
+        print(lista)
         
         if lista == []:
             self.send_response(404)
