@@ -1,13 +1,14 @@
 FROM ubuntu
 
 RUN apt-get update && \
-    apt-get install -y python3 && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y python3 python3-pip && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip3 install xmltodict requests
     
-EXPOSE 8080 8081
+EXPOSE 8080 8081 9000
 
-ADD *.py ./
+ADD *.py *.sh ./
+ADD pricingServer/*.py ./pricingServer/ 
 
-CMD python3 Main.py 8080 8081
-
+CMD ["/bin/bash", "/start.sh"]
 
