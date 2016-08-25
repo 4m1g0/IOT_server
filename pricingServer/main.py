@@ -38,10 +38,12 @@ class MyServer(BaseHTTPRequestHandler):
         if lista == []:
             self.send_response(404)
         else:
+            body = bytes(json.dumps(lista), 'utf-8')
             self.send_response(200)
             self.send_header("Content-type", "application/javascript")
+            self.send_header("Content-Length", len(body))
             self.end_headers()
-            self.wfile.write(bytes(json.dumps(lista), 'utf-8'))
+            self.wfile.write(body)
 
 myServer = HTTPServer((hostName, hostPort), MyServer)
 print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))
