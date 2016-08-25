@@ -1,55 +1,26 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import xmltodict
-import requests
+from RESTMethods.prices import *
+import sys
 import time
-import json
 
-hostName = ""
-hostPort = 9000
-cache = {}
-
-def getJson(url):
-    r = requests.get(url)
-    doc = {}
-    lista = []
-    try:
-        doc = xmltodict.parse(r.text)
-    
-        for i in doc['PVPCDesgloseHorario']['SeriesTemporales'][7]['Periodo']['Intervalo']:
-            lista.append(int(float(i['Ctd']['@v']) * 1000000))
-    except:
-        pass
-    return lista
-    
-
-
-
-class MyServer(BaseHTTPRequestHandler):
+class APIHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        lista = []
-        if self.path[1:] in cache:
-            lista = cache[self.path[1:]]
-            print("From cache:")
-        else:
-            lista = getJson("https://api.esios.ree.es/archives/80/download?date=" + self.path[1:])
-            cache[self.path[1:]] = lista
-        print(lista)
+        Prices(self).do_GET();
+    def do_POST(self):
+        Prices(self).do_GET();
+
+if __name__ == "__main__":
+    hostPort = 80
+    if (len(sys.argv) > 1):
+        hostPort = int(sys.argv[1])
         
-        if lista == []:
-            self.send_response(404)
-        else:
-            self.send_response(200)
-            self.send_header("Content-type", "application/javascript")
-            self.end_headers()
-            self.wfile.write(bytes(json.dumps(lista), 'utf-8'))
+    apiServer = HTTPServer(('', hostPort), APIHandler)
+    print(time.asctime(), "Server Starts - %s" % hostPort)
 
-myServer = HTTPServer((hostName, hostPort), MyServer)
-print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))
+    try:
+        apiServer.serve_forever()
+    except KeyboardInterrupt:
+        pass
 
-try:
-    myServer.serve_forever()
-except KeyboardInterrupt:
-    pass
-
-myServer.server_close()
-print(time.asctime(), "Server Stops - %s:%s" % (hostName, hostPort))
+    apiServer.server_close()
+    print(time.asctime(), "Server Stops - %s" %  hostPort)
