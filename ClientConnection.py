@@ -6,11 +6,14 @@ class ClientConnection(Connection):
         identifier = self.findId(msg)
         if identifier:
             self.id = identifier
+            end = msg.index(identifier)+len(identifier)+1
+            if len(msg) > end:
+                msg = msg[end:]
+        
+        if self.id in self.din:
+            self.din[self.id] = self.addMsgQueue(self.din[self.id], msg)
         else:
-            if self.id in self.din:
-                self.din[self.id] = self.addMsgQueue(self.din[self.id], msg)
-            else:
-                print("[" + self.__class__.__name__ + "] out Queue not instantiated for connection " + self.ip + ":" + str(self.port))
+            print("[" + self.__class__.__name__ + "] out Queue not instantiated for connection " + self.ip + ":" + str(self.port))
     
     def handleOut(self):
         if self.id in self.dout and self.dout[self.id]:

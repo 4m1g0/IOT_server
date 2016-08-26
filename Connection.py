@@ -68,7 +68,7 @@ class Connection(Process):
     
     def findId(self, msg):
         if msg.startswith(ID_PREFIX):
-            identifier = msg[4:]
+            identifier = msg[4:msg.index(b"\n")]
             return identifier.replace(b'\n', b'').replace(b'\r', b'')
     
     def cleanAndInitializeQueues(self, id):
