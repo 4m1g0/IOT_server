@@ -16,6 +16,7 @@ class Connection(Process):
         self.dout = dout
         self.id = ''
         self.lock = lock
+        self.idString = b''
         print("[+][" + self.__class__.__name__ + "] New thread started for " + ip + ":" + str(port))
         
     def run(self):
@@ -67,9 +68,10 @@ class Connection(Process):
         return queue, self.cleanQueue(queue)
     
     def findId(self, msg):
-        if msg.startswith(ID_PREFIX):
-            identifier = msg[4:msg.index(b"\n")]
-            return identifier.replace(b'\n', b'').replace(b'\r', b'')
+        index = msg.find(ID_PREFIX)
+        if index >= 0:
+            identifier = msg[index+4:msg.find(b"\n", index+4)]
+            return identifier.rstrip(b'\r\n')
     
     def cleanAndInitializeQueues(self, id):
         if id in self.din:
