@@ -27,6 +27,7 @@ def getJson(url):
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
         lista = []
+        print(self)
         if self.path[1:] in cache:
             lista = cache[self.path[1:]]
             print("From cache:")

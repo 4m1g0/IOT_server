@@ -5,10 +5,12 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install xmltodict requests
     
-EXPOSE 8080 8081 9000
+EXPOSE 8080 8081 9000 9001
 
-ADD *.py *.sh ./
+ADD *.sh ./
 ADD pricingServer/*.py ./pricingServer/ 
+ADD IOTServer/*.py ./IOTServer/ 
+ADD APIServer/*.py ./APIServer/ 
 
 CMD ["/bin/bash", "/start.sh"]
 

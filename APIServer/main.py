@@ -1,4 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from Parser import Parser
 import xmltodict
 import requests
 import time
@@ -6,7 +7,7 @@ import json
 import socket
 
 hostName = ""
-hostPort = 9000
+hostPort = 9001
 server_ip = "137.74.114.25"
 server_port = 8081
 
@@ -18,22 +19,60 @@ class MyServer(BaseHTTPRequestHandler):
             self.send_header("Content-Length", 0)
             self.end_headers()
             return
-
-        '''print(self.command + " " + self.path + " " + self.request_version)
-        print(self.headers)
-        print(self.rfile.read(int(self.headers.get('content-length'))))'''
         
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((server_ip, server_port))
         s.send(bytes("ID: " + network + "\n", 'utf-8'))
-        s.send(bytes(self.command + " " + self.path + " " + self.request_version, 'utf-8'))
-        s.send(bytes(str(self.headers), 'utf-8'))
+        try:
+            s.setblocking(1)
+            s.settimeout(0.01)
+            while s.recv(1): # flush buffer
+                pass
+        except:
+            pass
+            
+        s.send(bytes(self.command + " " + self.path + " " + self.request_version + '\r\n', 'utf-8'))
+        
+        if self.headers.get('content-length'):
+            s.send(bytes('Content-Length: ' + self.headers.get('content-length') + '\r\n', 'utf-8'))
+            
+        if self.headers.get('content-type'):
+            s.send(bytes('Content-Type: ' + self.headers.get('content-type') + '\r\n', 'utf-8'))
+            
+        s.send(bytes('\r\n', 'utf-8'))
+        #s.send(bytes(str(self.headers), 'utf-8'))
         length = self.headers.get('Content-length')
         if length:
             s.send(self.rfile.read(int(length)))
-        data = s.recv(1024)
+            
+        parser = Parser()
+        s.setblocking(1)
+        s.settimeout(10) # 10s timeout
+        while not parser.end():
+            try:
+                data = s.recv(1)
+            except:
+                break
+            
+            if not data:
+                break
+            parser.parse(data.decode("utf-8"))
+            #print(data.decode("utf-8"))
+        
         s.close()
-        self.wfile.write(data)
+        
+        if not parser.statusCode:
+            self.send_response(504) # gateway timeout
+            self.send_header("Content-Length", 0)
+            self.end_headers()
+            return
+            
+        self.send_response(parser.statusCode)
+        for header in parser.headers:
+            self.send_header(header[0], header[1])
+        
+        self.end_headers()
+        self.wfile.write(bytes(parser.body, 'utf-8'))
     
     do_HEAD = do_GET
     do_POST = do_GET
