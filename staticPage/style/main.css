@@ -1,0 +1,34 @@
+body {
+    background: white url("../img/background.png");
+}
+
+.navbar {
+    border-radius: 0;
+}
+
+.navbar-brand {
+    color: #fff !important;
+    font-family: 'Lobster', cursive;
+    font-size: 2em;
+}
+
+.navbar-inverse .navbar-nav>li>a {
+    color: #fff ;
+}
+
+.navbar .navbar-collapse {
+    text-align: center;
+}
+
+@media (min-width: 768px)
+{
+    .navbar .navbar-nav {
+        display:inline-block;
+        float:none;
+        vertical-align: top;
+    }
+}
+.navbar-nav .dropdown {
+    min-width: 158px;
+}
+
