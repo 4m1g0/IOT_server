@@ -77,6 +77,7 @@ class MyServer(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header("Content-Length", 0)
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         
     do_HEAD = do_GET
