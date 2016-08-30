@@ -74,9 +74,13 @@ class MyServer(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(bytes(parser.body, 'utf-8'))
     
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header("Content-Length", 0)
+        self.end_headers()
+        
     do_HEAD = do_GET
     do_POST = do_GET
-    do_OPTIONS = do_GET
     do_PUT = do_GET
     do_DELETE = do_GET
     
