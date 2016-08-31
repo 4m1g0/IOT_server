@@ -79,6 +79,7 @@ class MyServer(BaseHTTPRequestHandler):
         self.send_header("Content-Length", 0)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Headers", "network-token")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT")
         self.end_headers()
         
     do_HEAD = do_GET
