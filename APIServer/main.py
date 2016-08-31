@@ -74,7 +74,7 @@ class MyServer(BaseHTTPRequestHandler):
         if not "Access-Control-Allow-Methods" in parser.headers:
             self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT")
         
-        if not "Access-Control-Allow-Origin" in parser.headers:
+        if not "Access-Control-Allow-Origin" in [x[0] for x in parser.headers]:
             self.send_header("Access-Control-Allow-Origin", "*")
             
         if not "Access-Control-Allow-Headers" in parser.headers:
