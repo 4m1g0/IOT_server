@@ -71,6 +71,15 @@ class MyServer(BaseHTTPRequestHandler):
         for header in parser.headers:
             self.send_header(header[0], header[1])
         
+        if not "Access-Control-Allow-Methods" in parser.headers:
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT")
+        
+        if not "Access-Control-Allow-Origin" in parser.headers:
+            self.send_header("Access-Control-Allow-Origin", "*")
+            
+        if not "Access-Control-Allow-Headers" in parser.headers:
+            self.send_header("Access-Control-Allow-Headers", "network-token")
+        
         self.end_headers()
         self.wfile.write(bytes(parser.body, 'utf-8'))
     
