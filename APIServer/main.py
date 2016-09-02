@@ -72,7 +72,7 @@ class MyServer(BaseHTTPRequestHandler):
             self.send_header(header[0], header[1])
         
         if not "Access-Control-Allow-Methods" in parser.headers:
-            self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
         
         if not "Access-Control-Allow-Origin" in [x[0] for x in parser.headers]:
             self.send_header("Access-Control-Allow-Origin", "*")
@@ -88,7 +88,7 @@ class MyServer(BaseHTTPRequestHandler):
         self.send_header("Content-Length", 0)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Headers", "network-token")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
         self.end_headers()
         
     do_HEAD = do_GET
