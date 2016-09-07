@@ -12,7 +12,7 @@ server_ip = "137.74.114.25"
 server_port = 8081
 
 class APIServer(BaseHTTPRequestHandler):
-    def do_GET(self):
+    def do_ALL(self):
         network = self.headers.get('Network-token')
         if not network:
             self.send_response(401)
@@ -90,11 +90,12 @@ class APIServer(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "network-token")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
         self.end_headers()
-        
-    do_HEAD = do_GET
-    do_POST = do_GET
-    do_PUT = do_GET
-    do_DELETE = do_GET
+    
+    do_GET = do_ALL
+    do_HEAD = do_ALL
+    do_POST = do_ALL
+    do_PUT = do_ALL
+    do_DELETE = do_ALL
     
 
 myServer = HTTPServer((hostName, hostPort), APIServer)
