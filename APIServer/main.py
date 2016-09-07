@@ -11,7 +11,7 @@ hostPort = 9001
 server_ip = "137.74.114.25"
 server_port = 8081
 
-class MyServer(BaseHTTPRequestHandler):
+class APIServer(BaseHTTPRequestHandler):
     def do_GET(self):
         network = self.headers.get('Network-token')
         if not network:
@@ -97,7 +97,7 @@ class MyServer(BaseHTTPRequestHandler):
     do_DELETE = do_GET
     
 
-myServer = HTTPServer((hostName, hostPort), MyServer)
+myServer = HTTPServer((hostName, hostPort), APIServer)
 print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))
 
 try:
