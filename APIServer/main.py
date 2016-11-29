@@ -27,7 +27,7 @@ import socket
 
 hostName = ""
 hostPort = 9001
-server_ip = "137.74.114.25"
+server_ip = "localhost"
 server_port = 8081
 
 class APIServer(BaseHTTPRequestHandler):
