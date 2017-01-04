@@ -34,7 +34,7 @@ def getJson(url):
     try:
         doc = xmltodict.parse(r.text)
     
-        for i in doc['PVPCDesgloseHorario']['SeriesTemporales'][7]['Periodo']['Intervalo']:
+        for i in doc['PVPCDesgloseHorario']['SeriesTemporales'][10]['Periodo']['Intervalo']:
             lista.append(int(float(i['Ctd']['@v']) * 1000000))
     except:
         pass
