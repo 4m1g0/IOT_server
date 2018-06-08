@@ -1,3 +1,4 @@
+#!/usr/bin/python3.6
 #
 # main.py - Adaptor for https requests
 # Copyright 2016 Oscar Blanco.
@@ -18,9 +19,9 @@
 #
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from datetime import datetime, timedelta
 import xmltodict
 import requests
-import time
 import json
 
 hostName = ""
@@ -45,20 +46,26 @@ def getJson(url):
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
-        lista = []
-        print(self)
+        prices = []
+        if not self.path[1:].startswith("?date="):
+            return
         if self.path[1:] in cache:
-            lista = cache[self.path[1:]]
+            prices = cache[self.path[1:]]
             print("From cache:")
         else:
-            lista = getJson("https://api.esios.ree.es/archives/80/download?date=" + self.path[1:])
-            cache[self.path[1:]] = lista
-        print(lista)
+            date = datetime.strptime(self.path[7:], "%d-%m-%Y")
+            listToday = getJson("https://api.esios.ree.es/archives/80/download?date=" + date.strftime("%d-%m-%Y"))
+            dateYesterday = date - timedelta(days=1)
+            listaYesterday = getJson("https://api.esios.ree.es/archives/80/download?date=" + dateYesterday.strftime("%d-%m-%Y"))
+            prices = listaYesterday[-4:] + listToday # add 4 values from the day before
+            if len(prices) > 4:
+                cache[self.path[1:]] = prices
+        print(prices)
         
-        if lista == []:
+        if prices == []:
             self.send_response(404)
         else:
-            body = bytes(json.dumps(lista), 'utf-8')
+            body = bytes(json.dumps(prices), 'utf-8')
             self.send_response(200)
             self.send_header("Content-type", "application/javascript")
             self.send_header("Content-Length", len(body))
@@ -67,7 +74,7 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(body)
 
 myServer = HTTPServer((hostName, hostPort), MyServer)
-print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))
+print(datetime.now(), " Server Starts - %s:%s" % (hostName, hostPort))
 
 try:
     myServer.serve_forever()
@@ -75,4 +82,4 @@ except KeyboardInterrupt:
     pass
 
 myServer.server_close()
-print(time.asctime(), "Server Stops - %s:%s" % (hostName, hostPort))
+print(datetime.now(), " Server Stops - %s:%s" % (hostName, hostPort))
